@@ -32,7 +32,7 @@ jobs:
         with:
           platforms: ${{ env.platforms }}
           context: ${{ env.distro }}/${{ matrix.release }}
-          image: ${{ env.distro }}-toolbox
+          image: ${{ env.distro }}
           tags: ${{ matrix.release }}
           containerfiles: ${{ env.distro }}/${{ matrix.release }}/Containerfile
           layers: false
@@ -44,7 +44,7 @@ jobs:
         with:
           platforms: ${{ env.platforms }}
           context: ${{ env.distro }}/${{ matrix.release }}
-          image: ${{ env.IMAGE_NAME }}-toolbox
+          image: ${{ env.IMAGE_NAME }}
           tags: ${{ matrix.release }} latest
           containerfiles: ${{ env.distro }}/${{ matrix.release }}/Containerfile
           layers: false
@@ -57,7 +57,7 @@ jobs:
         with:
           username: ${{ secrets.actor }}
           password: ${{ secrets.TOKEN }}
-          image: ${{ env.IMAGE_NAME }}-toolbox
+          image: ${{ env.IMAGE_NAME }}
           registry: ${{ env.REGISTRY }}
           tags: ${{ matrix.release }}
 
@@ -68,7 +68,7 @@ jobs:
         with:
           username: ${{ secrets.actor }}
           password: ${{ secrets.TOKEN }}
-          image: ${{ env.IMAGE_NAME }}-toolbox
+          image: ${{ env.IMAGE_NAME }}
           registry: ${{ env.REGISTRY }}
           tags: ${{ matrix.release }} latest
 
@@ -76,7 +76,7 @@ jobs:
         uses: redhat-actions/podman-login@v1
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
         with:
-          registry: ${{ env.registry }}
+          registry: ${{ env.REGISTRY }}
           username: ${{ secrets.actor }}
           password: ${{ secrets.TOKEN }}
 
