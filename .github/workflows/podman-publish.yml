@@ -41,7 +41,6 @@ jobs:
           image: ${{ env.distro }}
           tags: ${{ matrix.release }}
           containerfiles: ${{ env.distro }}/${{ matrix.release }}/Containerfile
-          layers: false
           oci: true
 
       - name: Build container image (latest tag)
@@ -52,7 +51,6 @@ jobs:
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ matrix.release }} latest
           containerfiles: ${{ env.distro }}/${{ matrix.release }}/Containerfile
-          layers: false
           oci: true
 
       - name: Push to Container Registry
