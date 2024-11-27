@@ -28,7 +28,6 @@ jobs:
 
       - name: Login to gh Container Registry
         uses: redhat-actions/podman-login@v1
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.actor }}
@@ -36,7 +35,6 @@ jobs:
 
       - name: Build container image
         uses: redhat-actions/buildah-build@v2
-        if: env.latest_release != matrix.release
         with:
           platforms: ${{ env.platforms }}
           context: ${{ env.distro }}/${{ matrix.release }}
@@ -48,7 +46,6 @@ jobs:
 
       - name: Build container image (latest tag)
         uses: redhat-actions/buildah-build@v2
-        if: env.latest_release == matrix.release
         with:
           platforms: ${{ env.platforms }}
           context: ${{ env.distro }}/${{ matrix.release }}
@@ -61,7 +58,6 @@ jobs:
       - name: Push to Container Registry
         uses: redhat-actions/push-to-registry@v2
         id: push
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && env.latest_release != matrix.release
         with:
           username: ${{ secrets.actor }}
           password: ${{ secrets.TOKEN }}
@@ -72,7 +68,6 @@ jobs:
       - name: Push to Container Registry (latest tag)
         uses: redhat-actions/push-to-registry@v2
         id: push-latest
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && env.latest_release == matrix.release
         with:
           username: ${{ secrets.actor }}
           password: ${{ secrets.TOKEN }}
@@ -81,10 +76,8 @@ jobs:
           tags: ${{ matrix.release }} latest
 
       - uses: sigstore/cosign-installer@v3.3.0
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
 
       - name: Sign container image
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && env.latest_release != matrix.release
         run: |
           cosign sign -y --recursive --key env://COSIGN_PRIVATE_KEY ${{ env.registry }}/${{ env.distro }}-toolbox@${{ steps.push.outputs.digest }}
         env:
@@ -92,7 +85,6 @@ jobs:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
 
       - name: Sign container image (latest)
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && env.latest_release == matrix.release
         run: |
           cosign sign -y --recursive --key env://COSIGN_PRIVATE_KEY ${{ env.registry }}/${{ env.distro }}-toolbox@${{ steps.push-latest.outputs.digest }}
         env:
