@@ -17,7 +17,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: toolbox
+  IMAGE_NAME: ghcr.io/legitcamper/toolbox
 
 jobs:
   build:
