@@ -1,17 +1,15 @@
-FROM quay.io/toolbx-images/alpine-toolbox:edge
+FROM quay.io/toolbx/arch-toolbox:latest
 
 LABEL com.github.containers.toolbox="true" \
-      name="alpine-toolbox" \
+      name="arch-toolbox" \
       version="latest" \
       usage="This image is meant to be used with the toolbox command" \
-      summary="My own toolbox based on alpine-toolbox" \
+      summary="My own toolbox based on arch-toolbox" \
       maintainer="Sawyer Bristol <SawyerBristol@gmail.com>"
 
 # Install packages
 COPY packages /
-RUN apk update && \
-    apk upgrade && \
-    cat /packages | xargs apk add --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/
+RUN pacman -Syu --needed --noconfirm - < packages
 RUN rm /packages
 
 # Clear out /media
