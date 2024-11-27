@@ -1,11 +1,8 @@
 FROM quay.io/toolbx/arch-toolbox:latest
 
-LABEL com.github.containers.toolbox="true" \
-      name="arch-toolbox" \
-      version="latest" \
-      usage="This image is meant to be used with the toolbox command" \
-      summary="My own toolbox based on arch-toolbox" \
-      maintainer="Sawyer Bristol <SawyerBristol@gmail.com>"
+LABEL name="toolbox" \
+      summary="My dev toolbox container" \
+      maintainer="Sawyer Bristol"
 
 # Install packages
 COPY packages /
