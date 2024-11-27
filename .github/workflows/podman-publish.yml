@@ -33,23 +33,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.TOKEN }}
 
-      - name: Build container image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          platforms: ${{ env.platforms }}
-          context: ${{ env.distro }}/${{ matrix.release }}
-          image: ${{ env.distro }}
-          tags: ${{ matrix.release }}
-          containerfiles: ${{ env.distro }}/${{ matrix.release }}/Containerfile
-          oci: true
-
       - name: Build container image (latest tag)
         uses: redhat-actions/buildah-build@v2
         with:
           platforms: ${{ env.platforms }}
           context: ${{ env.distro }}/${{ matrix.release }}
           image: ${{ env.IMAGE_NAME }}
-          tags: ${{ matrix.release }} latest
+          tags: latest
           containerfiles: ${{ env.distro }}/${{ matrix.release }}/Containerfile
           oci: true
 
@@ -61,7 +51,7 @@ jobs:
           password: ${{ secrets.TOKEN }}
           image: ${{ env.IMAGE_NAME }}
           registry: ${{ env.REGISTRY }}
-          tags: ${{ matrix.release }}
+          tags: latest
 
       - name: Push to Container Registry (latest tag)
         uses: redhat-actions/push-to-registry@v2
@@ -71,7 +61,7 @@ jobs:
           password: ${{ secrets.TOKEN }}
           image: ${{ env.IMAGE_NAME }}
           registry: ${{ env.REGISTRY }}
-          tags: ${{ matrix.release }} latest
+          tags: latest
 
       - uses: sigstore/cosign-installer@v3.3.0
 
