@@ -30,7 +30,7 @@ jobs:
         uses: redhat-actions/podman-login@v1
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ env.actor }}
+          username: ${{ github.actor }}
           password: ${{ secrets.TOKEN }}
 
       - name: Build container image
@@ -59,7 +59,7 @@ jobs:
         uses: redhat-actions/push-to-registry@v2
         id: push
         with:
-          username: ${{ env.actor }}
+          username: ${{ github.actor }}
           password: ${{ secrets.TOKEN }}
           image: ${{ env.IMAGE_NAME }}
           registry: ${{ env.REGISTRY }}
@@ -69,7 +69,7 @@ jobs:
         uses: redhat-actions/push-to-registry@v2
         id: push-latest
         with:
-          username: ${{ env.actor }}
+          username: ${{ github.actor }}
           password: ${{ secrets.TOKEN }}
           image: ${{ env.IMAGE_NAME }}
           registry: ${{ env.REGISTRY }}
