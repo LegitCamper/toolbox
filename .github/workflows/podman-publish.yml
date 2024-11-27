@@ -26,6 +26,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Login to gh Container Registry
+        uses: redhat-actions/podman-login@v1
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.actor }}
+          password: ${{ secrets.TOKEN }}
+
       - name: Build container image
         uses: redhat-actions/buildah-build@v2
         if: env.latest_release != matrix.release
@@ -71,14 +79,6 @@ jobs:
           image: ${{ env.IMAGE_NAME }}
           registry: ${{ env.REGISTRY }}
           tags: ${{ matrix.release }} latest
-
-      - name: Login to Container Registry
-        uses: redhat-actions/podman-login@v1
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.actor }}
-          password: ${{ secrets.TOKEN }}
 
       - uses: sigstore/cosign-installer@v3.3.0
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
