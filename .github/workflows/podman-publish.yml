@@ -62,19 +62,3 @@ jobs:
           image: ${{ env.IMAGE_NAME }}
           registry: ${{ env.REGISTRY }}
           tags: latest
-
-      - uses: sigstore/cosign-installer@v3.3.0
-
-      - name: Sign container image
-        run: |
-          cosign sign -y --recursive --key env://COSIGN_PRIVATE_KEY ${{ env.registry }}/${{ env.distro }}-toolbox@${{ steps.push.outputs.digest }}
-        env:
-          COSIGN_EXPERIMENTAL: false
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-
-      - name: Sign container image (latest)
-        run: |
-          cosign sign -y --recursive --key env://COSIGN_PRIVATE_KEY ${{ env.registry }}/${{ env.distro }}-toolbox@${{ steps.push-latest.outputs.digest }}
-        env:
-          COSIGN_EXPERIMENTAL: false
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
