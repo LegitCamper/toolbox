@@ -1,0 +1,98 @@
+name: podman
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+on:
+  schedule:
+    - cron: '5 8 * * 0'
+  push:
+    branches:
+      - main
+    paths:
+      - Containerfile
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
+        if: env.latest_release != matrix.release
+        with:
+          platforms: ${{ env.platforms }}
+          context: ${{ env.distro }}/${{ matrix.release }}
+          image: ${{ env.distro }}-toolbox
+          tags: ${{ matrix.release }}
+          containerfiles: ${{ env.distro }}/${{ matrix.release }}/Containerfile
+          layers: false
+          oci: true
+
+      - name: Build container image (latest tag)
+        uses: redhat-actions/buildah-build@v2
+        if: env.latest_release == matrix.release
+        with:
+          platforms: ${{ env.platforms }}
+          context: ${{ env.distro }}/${{ matrix.release }}
+          image: ${{ env.IMAGE_NAME }}-toolbox
+          tags: ${{ matrix.release }} latest
+          containerfiles: ${{ env.distro }}/${{ matrix.release }}/Containerfile
+          layers: false
+          oci: true
+
+      - name: Push to Container Registry
+        uses: redhat-actions/push-to-registry@v2
+        id: push
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && env.latest_release != matrix.release
+        with:
+          username: ${{ secrets.actor }}
+          password: ${{ secrets.TOKEN }}
+          image: ${{ env.IMAGE_NAME }}-toolbox
+          registry: ${{ env.REGISTRY }}
+          tags: ${{ matrix.release }}
+
+      - name: Push to Container Registry (latest tag)
+        uses: redhat-actions/push-to-registry@v2
+        id: push-latest
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && env.latest_release == matrix.release
+        with:
+          username: ${{ secrets.actor }}
+          password: ${{ secrets.TOKEN }}
+          image: ${{ env.IMAGE_NAME }}-toolbox
+          registry: ${{ env.REGISTRY }
+          tags: ${{ matrix.release }} latest
+
+      - name: Login to Container Registry
+        uses: redhat-actions/podman-login@v1
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+        with:
+          registry: ${{ env.registry }}
+          username: ${{ secrets.actor }}
+          password: ${{ secrets.TOKEN }}
+
+      - uses: sigstore/cosign-installer@v3.3.0
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+
+      - name: Sign container image
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && env.latest_release != matrix.release
+        run: |
+          cosign sign -y --recursive --key env://COSIGN_PRIVATE_KEY ${{ env.registry }}/${{ env.distro }}-toolbox@${{ steps.push.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+
+      - name: Sign container image (latest)
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && env.latest_release == matrix.release
+        run: |
+          cosign sign -y --recursive --key env://COSIGN_PRIVATE_KEY ${{ env.registry }}/${{ env.distro }}-toolbox@${{ steps.push-latest.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
