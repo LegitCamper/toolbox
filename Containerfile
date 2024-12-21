@@ -1,7 +1,7 @@
 FROM quay.io/toolbx/arch-toolbox:latest
 
-ARG NAME=my-arch-toolbox
-LABEL name="$NAME" \
+LABEL com.github.containers.toolbox="true"
+      name="my-custom-toolbox" \
       summary="My dev toolbox container" \
       maintainer="Sawyer Bristol"
 
