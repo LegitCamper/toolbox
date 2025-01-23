@@ -1,4 +1,4 @@
-FROM quay.io/toolbx/arch-toolbox:latest
+FROM quay.io/toolbx-images/debian-toolbox:12
 
 LABEL com.github.containers.toolbox="true" \
       name="my-custom-toolbox" \
@@ -6,9 +6,8 @@ LABEL com.github.containers.toolbox="true" \
       maintainer="Sawyer Bristol"
 
 # Install packages
+RUN apt update  && apt install curl build-essential -y && \
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 COPY packages /
-RUN pacman -Syu --needed --noconfirm - < packages
+RUN xargs /home/linuxbrew/.linuxbrew/bin/brew install < packages
 RUN rm /packages
-
-# Clear out /media
-RUN rm -rf /media
