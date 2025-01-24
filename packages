@@ -11,6 +11,7 @@ jq
 fzf
 entr
 diffutils
+wl-clipboard
 helix
 lazygit
 eza
