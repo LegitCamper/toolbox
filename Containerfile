@@ -8,6 +8,6 @@ LABEL com.github.containers.toolbox="true" \
 # Install packages
 RUN apt update  && apt install curl build-essential -y && \
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-COPY packages /
-RUN ulimit -n 2046 && xargs /home/linuxbrew/.linuxbrew/bin/brew install < packages
-RUN rm /packages
+COPY install.sh packages /
+RUN ./install.sh 
+RUN rm /packages /install.sh
