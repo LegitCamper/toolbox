@@ -1,6 +1,7 @@
 # toolbox
-My toolbox container based on alpine-toolbox
+My toolbox container
 
 # Installation
-- `toolbox create --image ghcr.io/legitcamper/toolbox:latest`
-- `toolbox enter toolbox-latest`
+- `podman pull ghcr.io/legitcamper/toolbox:latest`
+- `toolbox create --image ghcr.io/legitcamper/toolbox:latest dev-toolbox`
+- `toolbox enter dev-toolbox`

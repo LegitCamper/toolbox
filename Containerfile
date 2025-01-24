@@ -1,13 +1,13 @@
-FROM quay.io/toolbx-images/debian-toolbox:12
+FROM quay.io/toolbx/arch-toolbox:latest
 
 LABEL com.github.containers.toolbox="true" \
-      name="my-custom-toolbox" \
       summary="My dev toolbox container" \
       maintainer="Sawyer Bristol"
 
 # Install packages
-RUN apt update  && apt install curl build-essential -y && \
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-COPY install.sh packages /
-RUN ./install.sh 
-RUN rm /packages /install.sh
+COPY packages /
+RUN pacman -Syu --needed --noconfirm - < packages
+RUN rm /packages
+
+# Clear out /media
+RUN rm -rf /media

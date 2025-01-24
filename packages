@@ -23,7 +23,7 @@ starship
 macchina
 bat
 rustup
-python@3.13
+python
 go
 pkgconf
 gcc
