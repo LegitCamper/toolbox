@@ -9,5 +9,5 @@ LABEL com.github.containers.toolbox="true" \
 RUN apt update  && apt install curl build-essential -y && \
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 COPY packages /
-RUN ulimit -n 1024 && xargs /home/linuxbrew/.linuxbrew/bin/brew install < packages
+RUN ulimit -n 2046 && xargs /home/linuxbrew/.linuxbrew/bin/brew install < packages
 RUN rm /packages
